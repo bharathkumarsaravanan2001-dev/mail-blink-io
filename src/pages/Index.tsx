@@ -3,7 +3,8 @@ import { EmailGenerator } from '@/components/EmailGenerator';
 import { InboxList } from '@/components/InboxList';
 import { EmailDetail } from '@/components/EmailDetail';
 import { SEO } from '@/components/SEO';
-import { supabase, API_URL } from '@/lib/supabase';
+import { SetupMessage } from '@/components/SetupMessage';
+import { supabase, API_URL, isSupabaseConfigured } from '@/lib/supabase';
 import { TempEmail, ReceivedEmail } from '@/types/email';
 import { useToast } from '@/hooks/use-toast';
 import { Loader2 } from 'lucide-react';
@@ -51,7 +52,7 @@ const Index = () => {
 
   // Fetch emails for current temp email
   const fetchEmails = async () => {
-    if (!tempEmail) return;
+    if (!tempEmail || !supabase) return;
     
     setIsFetchingEmails(true);
     try {
@@ -72,7 +73,7 @@ const Index = () => {
 
   // Subscribe to real-time email updates
   useEffect(() => {
-    if (!tempEmail) return;
+    if (!tempEmail || !supabase) return;
 
     // Initial fetch
     fetchEmails();
@@ -140,6 +141,11 @@ const Index = () => {
   }, []);
 
   const selectedEmail = emails.find((e) => e.id === selectedEmailId);
+
+  // Show setup message if Supabase is not configured
+  if (!isSupabaseConfigured) {
+    return <SetupMessage />;
+  }
 
   return (
     <>
